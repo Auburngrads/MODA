@@ -10,14 +10,14 @@
 #'@return MAVF breakout graph
 #'
 #'@importFrom ggplot2 ggplot geom_bar coord_flip ylab xlab ggtitle
-#'@importFrom dplyr %>% group_by
+#'@importFrom dplyr %>% group_by quo
 #'@importFrom stats reorder
 #'@importFrom tidyr gather
 #'
 #'@examples
 #'\dontrun{ 
 #'
-#'qbdata <- NFLcombine
+#'qbdata <- NFLcombine[1:7,]
 #'
 #'Height <- SAVF_exp_score(qbdata$heightinchestotal, 68, 75.21, 82)
 #'Weight <- SAVF_exp_score(qbdata$weight, 185, 224.34, 275)
@@ -28,7 +28,7 @@
 #'Wonderlic <- SAVF_exp_score(qbdata$wonderlic, 0, 27.08, 50)
 #'
 #'SAVF_matrix = cbind(Height, Weight, Forty, Shuttle, 
-#'                   Vertical, Broad, Wonderlic)
+#'                  Vertical, Broad, Wonderlic)
 #'weights = c(0.096, 0.224, 0.092, 0.138, 0.152, 0.228, 0.07)
 #'
 #'MAVF_breakout(SAVF_matrix, weights, qbdata$name)}
@@ -63,9 +63,9 @@ MAVF_breakout <- function(SAVF_matrix, weights, names){
   if(nrow(SAVF_matrix) != length(names) ) {
     stop('The number of rows in the SAVF matrix must equal the length of the vector of names')
   }
-
-  Measurement<-NULL
-  Value<-NULL
+  
+  Measurement <- dplyr::quo(Measurement)
+  Value <- dplyr::quo(Value)
   
   SAVF_matrix[is.na(SAVF_matrix)] <- 0
   SAVF <- t(SAVF_matrix) * weights
@@ -74,8 +74,9 @@ MAVF_breakout <- function(SAVF_matrix, weights, names){
 
   `%>%` <- dplyr::`%>%`
   
+  
   value %>%
-    tidyr::gather(Measurement, Value, -c(1, 2)) %>%
+    tidyr::gather(Measurement, Value, -c(1:2)) %>%
     dplyr::group_by(Measurement) %>%
     ggplot2::ggplot(ggplot2::aes(x = stats::reorder(names, MAVF), y = Value, fill = Measurement)) +
     ggplot2::geom_bar(stat = "identity") +

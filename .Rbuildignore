@@ -1,6 +1,10 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 README.Rmd
+README.md
 ^\.travis\.yml$
 ^.*\.dll$
 ^.*\.o$
+^revdep$
+cran-comments.md
+cran-comments.Rmd
